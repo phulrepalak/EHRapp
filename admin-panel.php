@@ -3,6 +3,7 @@ include("session.php");
 $title = 'CareYug EHR';
 $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
 include 'includes/header.php';
+
 ?>
 <!-- Admin Panel -->
 <div class="flex">
@@ -25,6 +26,8 @@ include 'includes/header.php';
                     include 'pages/profile.php';
                 } elseif ($page == 'settings') {
                     include 'pages/settings.php';
+                } elseif ($page == 'add-patient') {
+                    include 'pages/add-patient.php';
                 } else {
                     echo '<p class="text-red-500">Page not found.</p>';
                 }
