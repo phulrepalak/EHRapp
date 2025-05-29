@@ -33,7 +33,7 @@
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
                         echo "<tr class='border-b'>
-                                    <td class='px-4 py-2'>{$row['id']}</td>
+                                    <td class='px-4 py-2'><a href='?page=patient-profile&id={$row['id']}'>{$row['id']}</a></td>
                                     <td class='px-4 py-2'>{$row['name']}</td>
                                     <td class='px-4 py-2'>{$row['age']}</td>
                                     <td class='px-4 py-2'>{$row['gender']}</td>

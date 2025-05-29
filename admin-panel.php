@@ -28,6 +28,8 @@ include 'includes/header.php';
                     include 'pages/settings.php';
                 } elseif ($page == 'add-patient') {
                     include 'pages/add-patient.php';
+                } elseif ($page == 'patient-profile') {
+                    include 'pages/patient-profile.php';
                 } else {
                     echo '<p class="text-red-500">Page not found.</p>';
                 }
