@@ -6,20 +6,26 @@ include 'includes/header.php';
 
 ?>
 <!-- Admin Panel -->
-<div class="flex">
-    <!-- Sidebar here   -->
+<div class="flex  h-screen">
+    <!-- Sidebar -->
     <?php include 'includes/sidebar.php'; ?>
-    <div class="flex flex-col flex-1 bg-gray-100 ">
-        <div class="flex flex-1 bg-white p-4">
-            <div class="h-full w-full bg-white rounded-xl shadow-lg p-6 text-center">
 
-                <!-- Page Content Here -->
+    <!-- Main Content Area -->
+    <div class="flex flex-col flex-1 bg-white  overflow-hidden">
+
+        <!-- Main Page Content -->
+        <div class="flex-1 overflow-y-auto ">
+            <div class="w-full    p-6 text-center h-full">
 
                 <?php
                 if ($page == 'dashboard') {
-                    echo '<h2 class="text-2xl font-semibold text-gray-800 mb-4">Welcome to CareYug EHR Dashboard</h2>';
+                    include 'pages/dashboard.php';
                 } elseif ($page == 'patients') {
                     include 'pages/patients.php';
+                } elseif ($page == 'appointment-detail') {
+                    include 'pages/appointment-detail.php';
+                } elseif ($page == 'appointments') {
+                    include 'pages/appointments.php';
                 } elseif ($page == 'documents') {
                     include 'pages/documents.php';
                 } elseif ($page == 'profile') {
@@ -34,12 +40,15 @@ include 'includes/header.php';
                     echo '<p class="text-red-500">Page not found.</p>';
                 }
                 ?>
+
             </div>
         </div>
-        <!-- Copyrights -->
-        <footer class="text-grey text-center py-4 mt-auto border-t">
+
+        <!-- Footer -->
+        <footer class="text-gray-600 text-center py-4 border-t">
             <p>&copy; 2025 CareYug EHR. All rights reserved.</p>
         </footer>
     </div>
 </div>
+
 <?php include 'includes/footer.php'; ?>

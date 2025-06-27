@@ -9,7 +9,7 @@
     <!--   -->
 
     <!-- Patient Table -->
-    <div class="bg-white rounded-xl shadow-lg p-6 overflow-x-auto">
+    <div class="bg-white rounded-xl shadow-xl  border p-6 overflow-x-auto">
         <table id="patientTable" class="min-w-full table-auto text-left text-sm">
             <thead class="bg-gray-200">
                 <tr>
@@ -33,8 +33,8 @@
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
                         echo "<tr class='border-b'>
-                                    <td class='px-4 py-2'><a href='?page=patient-profile&id={$row['id']}'>{$row['id']}</a></td>
-                                    <td class='px-4 py-2'>{$row['name']}</td>
+                                    <td class='px-4 py-2'>{$row['id']}</td>
+                                    <td class='px-4 py-2'><a class='block' href='?page=patient-profile&id={$row['id']}'>{$row['name']}</a></td>
                                     <td class='px-4 py-2'>{$row['age']}</td>
                                     <td class='px-4 py-2'>{$row['gender']}</td>
                                     <td class='px-4 py-2'>{$row['contact']}</td>

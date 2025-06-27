@@ -4,7 +4,7 @@ $user = "root";
 $pass = "";
 $dbname = "careyugehrDB";
 
-$conn = new mysqli($host, $user, $pass, $dbname);
+$conn = new mysqli($host, $user, $pass, $dbname,);
 
 // Check connection
 if ($conn->connect_error) {
