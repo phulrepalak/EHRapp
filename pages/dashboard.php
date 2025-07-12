@@ -91,7 +91,7 @@
 
                     <?php
 
-                    $conn = new mysqli('localhost', 'root', '', 'careyugehrDB');
+                    $conn = new mysqli('localhost', 'root', '', 'careyugehrdb');
                     if ($conn->connect_error) {
                         die("Connection failed: " . $conn->connect_error);
                     }
