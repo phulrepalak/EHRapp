@@ -4,13 +4,13 @@ include 'db.php'; // include your db connection file
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get form inputs and sanitize
     $name = trim($_POST['name']);
-    $age = (int)$_POST['age'];
+    $age = (int) $_POST['age'];
     $phone = trim($_POST['phone']);
     $gender = trim($_POST['gender']);
 
     // Simple validation
     if (!empty($name) && $age > 0 && !empty($phone) && !empty($gender)) {
-        $stmt = $conn->prepare("INSERT INTO patients (name, age, contact, gender) VALUES (?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO patient (name, age, contact, gender) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("siss", $name, $age, $phone, $gender);
 
         if ($stmt->execute()) {
@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $stmt->close();
+        $conn->close();
     } else {
         $error = "Please fill all fields correctly.";
     }
@@ -43,7 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div>
                 <label class="block text-sm font-medium">age</label>
-                <input name="age" type="number" class="w-full border border-grey-500 placeholder-grey-500 rounded p-2" />
+                <input name="age" type="number"
+                    class="w-full border border-grey-500 placeholder-grey-500 rounded p-2" />
             </div>
             <div>
                 <label class="block text-sm font-medium">Phone Number</label>
@@ -67,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <script>
     var patientFormInputs = document.getElementById('patientForm').getElementsByTagName("input");
-    document.getElementById('patientForm').addEventListener('submit', function(e) {
+    document.getElementById('patientForm').addEventListener('submit', function (e) {
         let valid = true;
         const name = this.name.value.trim();
         const age = this.age.value.trim();
