@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $stmt = $conn->prepare("SELECT id ,name,password FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT id ,name,password FROM user WHERE email = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
 

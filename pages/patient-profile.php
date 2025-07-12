@@ -6,7 +6,7 @@ $id = $_GET["id"] ?? null;
 
 if ($id && is_numeric($id)) {
     // Prepare the SQL statement
-    $stmt = $conn->prepare("SELECT * FROM patients WHERE id = ?");
+    $stmt = $conn->prepare("SELECT * FROM patient WHERE id = ?");
     $stmt->bind_param("i", $id); // 'i' = integer
     $stmt->execute();
 
