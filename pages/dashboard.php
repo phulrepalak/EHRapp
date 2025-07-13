@@ -91,12 +91,12 @@
 
                     <?php
 
-                    $conn = new mysqli('localhost', 'root', '', 'careyugehrDB');
+                    $conn = new mysqli('localhost', 'root', '', 'careyugehrdb');
                     if ($conn->connect_error) {
                         die("Connection failed: " . $conn->connect_error);
                     }
 
-                    $result = $conn->query("SELECT * FROM patients ORDER BY id DESC");
+                    $result = $conn->query("SELECT * FROM patient ORDER BY id DESC");
                     if ($result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
                             echo "<tr class='border-b'>

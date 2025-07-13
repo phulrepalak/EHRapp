@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Simple validation
     if (!empty($name) && $age > 0 && !empty($phone) && !empty($gender)) {
-        $stmt = $conn->prepare("INSERT INTO patients (name, age, contact, gender) VALUES (?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO patient (name, age, contact, gender) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("siss", $name, $age, $phone, $gender);
 
         if ($stmt->execute()) {
