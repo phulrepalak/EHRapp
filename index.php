@@ -28,6 +28,7 @@
         <!-- Login Button (link to login.php) -->
         <a href="login.php" class="block text-center bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">Already
             have an account? Login</a>
+
     </form>
 </body>
 
