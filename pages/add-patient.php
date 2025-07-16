@@ -24,9 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "Please fill all fields correctly.";
     }
 }
-?>
-
-<?php if (!empty($success)): ?>
+// echoing the message: Patient added sucessfully
+ if (!empty($success)): ?>
     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
         <strong class="font-bold">Success!</strong>
         <span class="block sm:inline"><?php echo $success; ?></span>
