@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $phone = trim($_POST['phone']);
     $gender = trim($_POST['gender']);
 
-    // Simple validation
+    // Simple validation    
     if (!empty($name) && $age > 0 && !empty($phone) && !empty($gender)) {
         $stmt = $conn->prepare("INSERT INTO patient (name, age, contact, gender) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("siss", $name, $age, $phone, $gender);
@@ -25,6 +25,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
+<?php if (!empty($success)): ?>
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <strong class="font-bold">Success!</strong>
+        <span class="block sm:inline"><?php echo $success; ?></span>
+    </div>
+<?php endif; ?>
+
+<?php if (!empty($error)): ?>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span class="block sm:inline"><?php echo $error; ?></span>
+    </div>
+<?php endif; ?>
+
+
 
 
 <div class="max-w-full mx-auto bg-white p-6 rounded shadow-3">
