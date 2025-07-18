@@ -36,14 +36,38 @@
         <!-- Appointments -->
 
 
-        <div class="w-64 h-80 rounded-xl  shadow bg-white border text-left  ">
-            <p class="font-bold text-xl p-4">Appointments</p>
-            <p class="font-thin text-lg p-2"> harsh</p>
-            <p class="font-thin text-base p-2"> Time-11:00 AM</p>
-            <p class="font-thin text-lg p-2">Manish </p>
-            <p class="font-thin text-base p-2"> Time-12:00</p>
+    <?php
+include 'db.php';
 
-        </div>
+// Fetch recent appointments (latest 5)
+$sql = "SELECT p.name, a.time 
+        FROM appointment a
+        JOIN patient p ON a.patient_id = p.id
+        ORDER BY a.date DESC, a.time DESC
+        LIMIT 5";
+
+$result = $conn->query($sql);
+?>
+
+<div class="w-64 h-80 rounded-xl shadow bg-white border text-left overflow-y-auto">
+    <p class="font-bold text-xl p-4">Appointments</p>
+
+    <?php
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            ?>
+            <div class="px-4 py-2 border-b">
+                <p class="font-medium text-lg"><?php echo htmlspecialchars($row['name']); ?></p>
+                <p class="font-thin text-sm text-gray-600">Time - <?php echo date("h:i A", strtotime($row['time'])); ?></p>
+            </div>
+            <?php
+        }
+    } else {
+        echo '<p class="text-gray-400 px-4">No appointments</p>';
+    }
+    ?>
+</div>
+
 
 
         <!-- Hide Scrollbar  -->
