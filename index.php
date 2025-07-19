@@ -16,18 +16,30 @@
         </div>
     <?php endif; ?>
 
-    <form action="register_user.php" method="POST" class="bg-white p-6 rounded shadow-md w-full max-w-sm mx-auto">
-        <input type="text" name="name" placeholder="Name" required class="block w-full mb-4 p-2 border rounded">
-        <input type="email" name="email" placeholder="Email" required class="block w-full mb-4 p-2 border rounded">
-        <input type="password" name="password" placeholder="Password" required
-            class="block w-full mb-4 p-2 border rounded">
+    <form action="register_user.php" method="POST" enctype="multipart/form-data" class="bg-white p-6 rounded shadow-md w-full max-w-sm mx-auto space-y-4">
+
+        <input type="text" name="name" placeholder="Name" required class="block w-full p-2 border rounded">
+
+        <input type="email" name="email" placeholder="Email" required class="block w-full p-2 border rounded">
+
+        <input type="password" name="password" placeholder="Password" required class="block w-full p-2 border rounded">
+
+        <input type="date" name="dob" required class="block w-full p-2 border rounded">
+
+        <input type="tel" name="contact" placeholder="Contact Number" required class="block w-full p-2 border rounded">
+
+        <input type="text" name="role" placeholder="Role (e.g. Admin, Doctor, Staff)" required class="block w-full p-2 border rounded">
+
+        <label class="block text-sm font-medium text-gray-700">Profile Picture</label>
+        <input type="file" name="profile_img" accept="image/*" class="block w-full text-sm text-gray-600">
 
         <!-- Register Button -->
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded w-full mb-2">Register</button>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded w-full">Register</button>
 
-        <!-- Login Button (link to login.php) -->
-        <a href="login.php" class="block text-center bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">Already
-            have an account? Login</a>
+        <!-- Login Button -->
+        <a href="login.php" class="block text-center bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">
+            Already have an account? Login
+        </a>
 
     </form>
 </body>
