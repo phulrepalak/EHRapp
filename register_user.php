@@ -1,19 +1,23 @@
 <?php
 include 'db.php';
 
-$name     = $_POST['name'];
-$email    = $_POST['email'];
-$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-$dob      = $_POST['dob'];
-$contact  = $_POST['contact'];
-$role     = $_POST['role'];
+// Check if all POST fields exist
+$name     = $_POST['name'] ?? '';
+$email    = $_POST['email'] ?? '';
+$password = isset($_POST['password']) ? password_hash($_POST['password'], PASSWORD_DEFAULT) : '';
+$dob      = $_POST['dob'] ?? '';
+$contact  = $_POST['contact'] ?? '';
+$role     = $_POST['role'] ?? '';
+$removeImage = $_POST['remove_image'] ?? '0';
 
-// Handle profile image upload
-$profileImgPath = "uploads/default-avatar.png"; // default
-if (isset($_FILES['profile_img']) && $_FILES['profile_img']['error'] === UPLOAD_ERR_OK) {
+// Set default image path
+$profileImgPath = "uploads/default-avatar.png";
+
+// Upload if image is selected and not removed
+if (isset($_FILES['profile_img']) && $_FILES['profile_img']['error'] === UPLOAD_ERR_OK && $removeImage !== "1") {
     $uploadDir = "uploads/";
     if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0777, true); // Create directory if not exists
+        mkdir($uploadDir, 0777, true);
     }
 
     $fileTmpPath = $_FILES['profile_img']['tmp_name'];
@@ -31,7 +35,7 @@ if (isset($_FILES['profile_img']) && $_FILES['profile_img']['error'] === UPLOAD_
     }
 }
 
-// Check for duplicate email
+// Prevent duplicate emails
 $checkEmailSql = "SELECT id FROM user WHERE email = ?";
 $checkStmt = $conn->prepare($checkEmailSql);
 $checkStmt->bind_param("s", $email);
@@ -39,12 +43,12 @@ $checkStmt->execute();
 $checkStmt->store_result();
 
 if ($checkStmt->num_rows > 0) {
-    header("Location: register.php?error=email_exists");
+    header("Location: index.php?error=email_exists");
     exit();
 }
 
-// Insert new user
-$sql = "INSERT INTO user (name, email, password, dob, contact, role, profile_img) 
+// Insert user
+$sql = "INSERT INTO user (name, email, password, dob, contact, role, profile_img)
         VALUES (?, ?, ?, ?, ?, ?, ?)";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("sssssss", $name, $email, $password, $dob, $contact, $role, $profileImgPath);
