@@ -15,14 +15,18 @@
         </div>
     <?php endif; ?>
 
-    <form action="register_user.php" method="POST" enctype="multipart/form-data" class="p-6 bg-white rounded-xl shadow max-w-sm mx-auto">
+    <form action="register_user.php" method="POST" enctype="multipart/form-data"
+        class="p-6 bg-white rounded-xl shadow max-w-sm mx-auto">
         <!-- Avatar Display -->
-        <div class="w-24 h-24 rounded-full mx-auto mb-4 bg-gray-200 flex items-center justify-center overflow-hidden" id="avatarWrapper">
-            <img id="avatarPreview" src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" alt="Default Avatar" class="w-full h-full object-cover">
+        <div class="w-24 h-24 rounded-full mx-auto mb-4 bg-gray-200 flex items-center justify-center overflow-hidden"
+            id="avatarWrapper">
+            <img id="avatarPreview" src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" alt="Default Avatar"
+                class="w-full h-full object-cover">
         </div>
 
         <!-- File Input -->
-        <input type="file" name="profile_img" id="profile_img" class="hidden" accept="image/*" onchange="previewImage(event)">
+        <input type="file" name="profile_img" id="profile_img" class="hidden" accept="image/*"
+            onchange="previewImage(event)">
         <label for="profile_img" class="block text-center text-blue-500 cursor-pointer">Upload Image</label>
 
         <!-- Hidden Input for remove image (can be handled later if needed) -->
@@ -38,6 +42,14 @@
 
         <!-- Submit -->
         <button type="submit" class="mt-4 w-full bg-blue-500 text-white p-2 rounded">Register</button>
+
+        <!-- Already have account text -->
+        <p class="mt-4 text-center text-m text-gray-800">
+            Already have an account?
+            <a href="login.php" class="text-blue-600 font-medium hover:underline">Login</a>
+        </p>
+
+
     </form>
 
     <script>
@@ -53,4 +65,5 @@
     </script>
 
 </body>
+
 </html>
