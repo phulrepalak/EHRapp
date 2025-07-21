@@ -8,13 +8,14 @@
 
 
     <!-- Search Bar -->
-   <form method="GET" class="mb-8">
-    <input type="hidden" name="page" value="patients">
-    <input type="text" name="search" placeholder="Search by name or contact"
-        value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>"
-        class="border border-gray-300 px-4 py-2 rounded-lg w-full sm:w-1/3">
-    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium">Search</button>
-</form>
+    <form method="GET" class="mb-8">
+        <input type="hidden" name="page" value="patients">
+        <input type="text" name="search" placeholder="Search by name or contact"
+            value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>"
+            class="border border-gray-300 px-4 py-2 rounded-lg w-full sm:w-1/3">
+        <button type="submit"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium">Search</button>
+    </form>
 
 
     <!--   -->
@@ -33,35 +34,39 @@
             </thead>
             <tbody>
 
-         <?php
-$conn = new mysqli('localhost', 'root', '', 'careyugehrdb');
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+                <?php
+                $conn = new mysqli('localhost', 'root', '', 'careyugehrdb');
+                if ($conn->connect_error) {
+                    die("Connection failed: " . $conn->connect_error);
+                }
 
-$search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
-$sql = "SELECT * FROM patient";
+                $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
+                $sql = "SELECT * FROM patient";
 
 
-if (!empty($search)) {
-    $sql .= " WHERE name LIKE '%$search%' OR contact LIKE '%$search%'";
-}
+                if (!empty($search)) {
+                    $sql .= " WHERE name LIKE '%$search%' OR contact LIKE '%$search%'";
+                }
 
-$sql .= " ORDER BY id DESC";
+                $sql .= " ORDER BY id DESC";
 
-$result = $conn->query($sql);
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        echo "<tr class='border-b'>
+                $result = $conn->query($sql);
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        echo "<tr class='border-b'>
                   <td class='px-4 py-2'>{$row['id']}</td>
                   <td class='px-4 py-2'><a class='block' href='?page=patient-profile&id={$row['id']}'>{$row['name']}</a></td>
                   <td class='px-4 py-2'>{$row['age']}</td>
                   <td class='px-4 py-2'>{$row['gender']}</td>
                   <td class='px-4 py-2'>{$row['contact']}</td>
               </tr>";
-    }
-} else {
-    echo "<tr><td colspan='5' class='text-center py-4'>No patients found.</td></tr>";
-}
-$conn->close();
-?>
+                    }
+                } else {
+                    echo "<tr><td colspan='5' class='text-center py-4'>No patients found.</td></tr>";
+                }
+                $conn->close();
+                ?>
+            </tbody>
+        </table>
+    </div>
+</div>
