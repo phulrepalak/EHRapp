@@ -2,12 +2,12 @@
 include 'db.php';
 
 // Check if all POST fields exist
-$name     = $_POST['name'] ?? '';
-$email    = $_POST['email'] ?? '';
+$name = $_POST['name'] ?? '';
+$email = $_POST['email'] ?? '';
 $password = isset($_POST['password']) ? password_hash($_POST['password'], PASSWORD_DEFAULT) : '';
-$dob      = $_POST['dob'] ?? '';
-$contact  = $_POST['contact'] ?? '';
-$role     = $_POST['role'] ?? '';
+$dob = $_POST['dob'] ?? '';
+$contact = $_POST['contact'] ?? '';
+$role = $_POST['role'] ?? '';
 $removeImage = $_POST['remove_image'] ?? '0';
 
 // Set default image path
@@ -54,6 +54,9 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("sssssss", $name, $email, $password, $dob, $contact, $role, $profileImgPath);
 
 if ($stmt->execute()) {
+    session_start(); // Start the session
+    $_SESSION['email'] = $email; // Store logged-in user's email
+
     echo "<script>
         alert('User registered successfully!');
         window.location.href = 'login.php';
