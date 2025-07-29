@@ -36,8 +36,8 @@ $result = $conn->query($sql);
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
         <h1 class="text-3xl font-bold text-gray-800">🩺 Appointment Records</h1>
-        <a href="admin-panel.php?page=appointment-detail" 
-           class="mt-4 sm:mt-0 inline-flex items-center px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium text-sm rounded-lg shadow transition">
+        <a href="admin-panel.php?page=appointment-detail"
+            class="mt-4 sm:mt-0 inline-flex items-center px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium text-sm rounded-lg shadow transition">
             ➕ New Appointment
         </a>
     </div>
@@ -46,15 +46,10 @@ $result = $conn->query($sql);
     <form method="GET" action="admin-panel.php" class="mb-8">
         <input type="hidden" name="page" value="appointments">
         <div class="flex justify-center">
-            <input 
-                type="text" 
-                name="search" 
-                value="<?php echo htmlspecialchars($search); ?>" 
-                placeholder="🔍 Search by  Patient Name, Date, Time, Doctor or Patient ID" 
-                class="w-full max-w-xl border border-gray-300 px-5 py-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-            <button type="submit" 
-                    class="ml-3 px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow">
+            <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>"
+                placeholder="🔍 Search by  Patient Name, Date, Time, Doctor or Patient ID"
+                class="w-full max-w-xl border border-gray-300 px-5 py-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="submit" class="ml-3 px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow">
                 Search
             </button>
         </div>
@@ -77,9 +72,17 @@ $result = $conn->query($sql);
                     <?php while ($row = $result->fetch_assoc()): ?>
                         <tr class="hover:bg-blue-50 transition">
                             <td class="px-6 py-4 text-sm text-gray-800"><?php echo $row['patient_id']; ?></td>
-                            <td class="px-6 py-4 text-sm text-gray-800"><?php echo htmlspecialchars($row['patient_name']); ?></td>
-                            <td class="px-6 py-4 text-sm text-gray-800"><?php echo htmlspecialchars($row['appointment_date']); ?></td>
-                            <td class="px-6 py-4 text-sm text-gray-800"><?php echo date("h:i A", strtotime($row['appointment_time'])); ?></td>
+                            <td class="px-6 py-4 text-sm text-gray-800">
+                                <a href="pages\appointment-edit.php?id=<?php echo $row['patient_id']; ?>">
+                                    
+                                    <?php echo htmlspecialchars($row['patient_name']); ?>
+                                </a>
+                            </td>
+
+                            <td class="px-6 py-4 text-sm text-gray-800">
+                                <?php echo htmlspecialchars($row['appointment_date']); ?></td>
+                            <td class="px-6 py-4 text-sm text-gray-800">
+                                <?php echo date("h:i A", strtotime($row['appointment_time'])); ?></td>
                             <td class="px-6 py-4 text-sm text-gray-800"><?php echo htmlspecialchars($row['doctor']); ?></td>
                         </tr>
                     <?php endwhile; ?>
