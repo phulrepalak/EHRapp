@@ -42,6 +42,12 @@ if ($patient_id && is_numeric($patient_id)) {
     $stmt->execute();
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
+
+    // Fetch documents for patient
+    $docStmt = $conn->prepare("SELECT * FROM document WHERE patient_id = ? ORDER BY uploaded_at DESC");
+    $docStmt->bind_param("i", $patient_id);
+    $docStmt->execute();
+    $documents = $docStmt->get_result();
 }
 ?>
 <!DOCTYPE html>
@@ -69,7 +75,6 @@ if ($patient_id && is_numeric($patient_id)) {
 
     <form method="POST" id="profile-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <input type="hidden" name="patient_id" value="<?= $row['id'] ?>">
-
         <div>
             <label class="text-gray-600 font-medium">Name</label>
             <input type="text" name="name" readonly value="<?= htmlspecialchars($row['name']) ?>"
@@ -153,15 +158,58 @@ if ($patient_id && is_numeric($patient_id)) {
 
 
         <div class="col-span-2 flex justify-end mt-4 gap-3">
-           <a href="/pages/upload_document.php?id=<?= $row['id'] ?>"
+            <a href="/pages/upload_document.php?id=<?= $row['id'] ?>"
                 class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">Upload Document</a>
             <button type="button" id="editBtn"
                 class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Edit</button>
             <button type="submit" name="save" id="saveBtn"
                 class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 hidden">Save</button>
         </div>
-
     </form>
+
+    <!-- Documents Section -->
+    <h3 class="text-xl font-bold text-gray-800 mt-10 mb-4">Uploaded Documents</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <?php while ($doc = $documents->fetch_assoc()): 
+          $filePath = '/' . $doc['filepath'];
+
+            $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+            $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'webp']);
+            $isPdf = $ext === 'pdf';
+        ?>
+        <div class="bg-white rounded-xl border border-gray-200 shadow hover:shadow-md transition">
+            <button onclick="openPreview('<?= $filePath ?>')" class="w-full focus:outline-none">
+                <?php if ($isImage): ?>
+                    <img src="<?= $filePath ?>" alt="Document" class="w-full h-64 object-cover rounded-t-xl">
+                <?php elseif ($isPdf): ?>
+                    <div class="w-full h-64 flex items-center justify-center bg-gray-100 text-lg font-medium text-gray-700">
+                        PDF Document
+                    </div>
+                <?php endif; ?>
+            </button>
+            <div class="p-4 space-y-1">
+                <p class="text-gray-800 font-semibold">📄 <?= htmlspecialchars($doc['report_name']) ?></p>
+                <p class="text-sm text-gray-600">Uploaded by: <?= htmlspecialchars($doc['uploaded_by']) ?></p>
+                <p class="text-sm text-gray-500"><?= date("d M Y, h:i A", strtotime($doc['uploaded_at'])) ?></p>
+                <form method="POST" action="/pages/delete_document.php" onsubmit="return confirm('Are you sure?')">
+                    <input type="hidden" name="document_id" value="<?= $doc['id'] ?>">
+                    <button type="submit" class="text-red-500 hover:underline text-sm">Delete</button>
+                </form>
+            </div>
+        </div>
+        <?php endwhile; ?>
+    </div>
+</div>
+
+<!-- Modal Preview -->
+<div id="previewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white max-w-4xl w-full rounded-xl overflow-hidden">
+        <div class="flex justify-between items-center px-4 py-3 border-b">
+            <h3 class="text-lg font-semibold">Document Preview</h3>
+            <button onclick="closePreview()" class="text-gray-500 hover:text-red-500 text-xl">&times;</button>
+        </div>
+        <div class="p-4" id="previewContent"></div>
+    </div>
 </div>
 
 <script>
@@ -173,7 +221,7 @@ if ($patient_id && is_numeric($patient_id)) {
         inputs.forEach(input => {
             if (input.name && input.type !== "hidden") {
                 input.readOnly = false;
-                input.disabled = false;  // for select fields
+                input.disabled = false;
                 input.classList.remove('bg-gray-100');
                 input.classList.add('bg-white');
             }
@@ -182,5 +230,25 @@ if ($patient_id && is_numeric($patient_id)) {
         saveBtn.classList.remove('hidden');
     });
 
+    function openPreview(path) {
+        const modal = document.getElementById('previewModal');
+        const content = document.getElementById('previewContent');
+        const ext = path.split('.').pop().toLowerCase();
+        content.innerHTML = '';
+        if (['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
+            content.innerHTML = `<img src="${path}" class="w-full rounded" />`;
+        } else if (ext === 'pdf') {
+            content.innerHTML = `<iframe src="${path}" class="w-full h-[500px]" frameborder="0"></iframe>`;
+        } else {
+            content.innerHTML = `<p class='text-red-500'>Unsupported format.</p>`;
+        }
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
 
+    function closePreview() {
+        const modal = document.getElementById('previewModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
 </script>
