@@ -44,7 +44,13 @@ if ($patient_id && is_numeric($patient_id)) {
     $row = $result->fetch_assoc();
 }
 ?>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
 <div class="max-w-4xl mx-auto p-6 bg-white rounded-2xl shadow-xl mt-10">
     <?php if ($success): ?>
@@ -56,7 +62,7 @@ if ($patient_id && is_numeric($patient_id)) {
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-800">Patient Profile</h2>
         <div class="flex gap-3">
-            <a href="pages/appointment-detail.php?id=<?= urlencode($row['id']) ?>"
+            <a href="/pages/appointment-detail.php?id=<?= urlencode($row['id']) ?>"
                 class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">New Appointment</a>
         </div>
     </div>
@@ -147,7 +153,7 @@ if ($patient_id && is_numeric($patient_id)) {
 
 
         <div class="col-span-2 flex justify-end mt-4 gap-3">
-            <a href="upload_document.php?id=<?= urlencode($row['id']) ?>"
+           <a href="/pages/upload_document.php?id=<?= $row['id'] ?>"
                 class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">Upload Document</a>
             <button type="button" id="editBtn"
                 class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Edit</button>
