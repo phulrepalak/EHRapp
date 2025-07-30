@@ -35,10 +35,11 @@ $result = $conn->query($sql);
 
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">🩺 Appointment Records</h1>
+       <h1 class="text-2xl text-center text-gray-800 mb-4 mx-auto font-semibold">Appointment Records</h1>
+
         <a href="admin-panel.php?page=appointment-detail"
             class="mt-4 sm:mt-0 inline-flex items-center px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium text-sm rounded-lg shadow transition">
-            ➕ New Appointment
+            New Appointment
         </a>
     </div>
 
@@ -47,7 +48,7 @@ $result = $conn->query($sql);
         <input type="hidden" name="page" value="appointments">
         <div class="flex justify-center">
             <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>"
-                placeholder="🔍 Search by  Patient Name, Date, Time, Doctor or Patient ID"
+                placeholder=" Search by  Patient Name, Date, Time, Doctor or Patient ID"
                 class="w-full max-w-xl border border-gray-300 px-5 py-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             <button type="submit" class="ml-3 px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow">
                 Search
@@ -56,9 +57,9 @@ $result = $conn->query($sql);
     </form>
 
     <!-- Appointment Table Card -->
-    <div class="overflow-x-auto bg-white shadow-lg rounded-lg">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-blue-100 text-gray-700 sticky top-0 z-10">
+    <div class="bg-white rounded-xl shadow-xl  border p-6 overflow-x-auto">
+        <table class="min-w-full table-auto text-left text-sm">
+            <thead class="bg-gray-200  sticky top-0 z-10">
                 <tr>
                     <th class="px-6 py-4 text-left text-sm font-semibold uppercase">Patient ID</th>
                     <th class="px-6 py-4 text-left text-sm font-semibold uppercase">Patient Name</th>
