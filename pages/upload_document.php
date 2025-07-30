@@ -1,43 +1,49 @@
 <?php
 include "db.php";
 
+// Get patient ID from GET or POST
+$patient_id = $_GET['id'] ?? $_POST['patient_id'] ?? null;
 
-$patientId = $_GET['id'] ?? $_POST['patient_id'] ?? null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document']) && $patient_id) {
+    // Get input values
+    $report_name = $_POST['report_name'] ?? '';
+    $uploaded_by = $_POST['uploaded_by'] ?? '';
+    $file_name = $_FILES['document']['name'];
+    $tmp_name = $_FILES['document']['tmp_name'];
+    $upload_dir = "uploads/";
+    $file_path = $upload_dir . time() . "_" . basename($file_name);
+    $uploaded_at = date("Y-m-d H:i:s");
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document']) && $patientId) {
-    $reportName = $_POST['report_name'];
-    $uploadedBy = $_POST['uploaded_by'];
-    $fileName = $_FILES['document']['name'];
-    $tmpName = $_FILES['document']['tmp_name'];
-    $report_name = $_POST['report_name'];
-    $uploadDir = "uploads/";
-    $filePath = $uploadDir . time() . "_" . basename($fileName);
-
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
+    // Create upload directory if it doesn't exist
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0777, true);
     }
 
-    // Fetch patient name from patient table
+    // Fetch patient name
     $stmt = $conn->prepare("SELECT name FROM patient WHERE id = ?");
-    $stmt->bind_param("i", $patientId);
+    $stmt->bind_param("i", $patient_id);
     $stmt->execute();
     $result = $stmt->get_result();
-    $patientName = '';
+    $patient_name = '';
     if ($row = $result->fetch_assoc()) {
-        $patientName = $row['name'];
+        $patient_name = $row['name'];
     }
 
-    if (move_uploaded_file($tmpName, $filePath)) {
-       $stmt = $conn->prepare("INSERT INTO documents (patient_id, name, report_name, file_name, filepath, uploaded_at, uploaded_by) VALUES (?, ?, ?, ?, ?, ?, ?)");
-$stmt->bind_param("issssss", $patient_id, $name, $report_name, $file_name, $filepath, $uploaded_at, $uploaded_by);
+    // Upload and insert
+    if (move_uploaded_file($tmp_name, $file_path)) {
+        $stmt = $conn->prepare("INSERT INTO document (patient_id, name, report_name, file_name, filepath, uploaded_at, uploaded_by) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("issssss", $patient_id, $patient_name, $report_name, $file_name, $file_path, $uploaded_at, $uploaded_by);
         $stmt->execute();
 
-        echo "<script>alert('Document uploaded successfully'); window.location='patient-profile.php?id=$patientId';</script>";
+        echo "<script>alert('Document uploaded successfully'); window.location='patient-profile.php?id=$patient_id';</script>";
     } else {
-        echo "<script>alert('Failed to upload');</script>";
+        echo "<script>alert('Failed to upload document.');</script>";
     }
+} elseif (!$patient_id) {
+    echo "<script>alert('Patient ID is missing.');</script>";
 }
 ?>
+
 
 
 <!DOCTYPE html>
@@ -49,12 +55,13 @@ $stmt->bind_param("issssss", $patient_id, $name, $report_name, $file_name, $file
 </head>
 <body class="bg-gray-100">
 
-<?php if ($patientId): ?>
+<?php if ($patient_id): ?>
 <div class="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow border border-gray-200 mt-10">
   <h2 class="text-xl font-semibold text-gray-800 mb-6">Upload Document</h2>
 
   <form method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="patient_id" value="<?= htmlspecialchars($patientId) ?>">
+    <input type="hidden" name="patient_id" value="<?= $patient_id ?>">
+
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
