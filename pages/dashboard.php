@@ -40,11 +40,12 @@
 include 'db.php';
 
 // Fetch recent appointments (latest 5)
-$sql = "SELECT p.name, a.time 
+$sql = $sql = "SELECT p.name, a.appointment_time 
         FROM appointment a
         JOIN patient p ON a.patient_id = p.id
-        ORDER BY a.date DESC, a.time DESC
+        ORDER BY a.appointment_date DESC, a.appointment_time DESC
         LIMIT 5";
+
 
 $result = $conn->query($sql);
 ?>
