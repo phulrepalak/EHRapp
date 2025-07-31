@@ -40,12 +40,13 @@
 include 'db.php';
 
 // Fetch recent appointments (latest 5)
-$sql = $sql = "SELECT p.name, a.appointment_time 
+
+
+$sql = "SELECT p.name, a.appointment_time, a.appointment_date 
         FROM appointment a
         JOIN patient p ON a.patient_id = p.id
         ORDER BY a.appointment_date DESC, a.appointment_time DESC
         LIMIT 5";
-
 
 $result = $conn->query($sql);
 ?>
@@ -56,10 +57,14 @@ $result = $conn->query($sql);
     <?php
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
+            $formattedTime = date("h:i A", strtotime($row['appointment_time']));
+            $formattedDate = date("d M Y", strtotime($row['appointment_date']));
             ?>
             <div class="px-4 py-2 border-b">
-                <p class="font-medium text-lg"><?php echo htmlspecialchars($row['name']); ?></p>
-                <p class="font-thin text-sm text-gray-600">Time - <?php echo date("h:i A", strtotime($row['appointment_time'])); ?></p>
+                <p class="font-medium text-lg"><?= htmlspecialchars($row['name']) ?></p>
+                <p class="font-thin text-sm text-gray-600">
+                    <?= $formattedDate ?> at <?= $formattedTime ?>
+                </p>
             </div>
             <?php
         }
@@ -68,6 +73,7 @@ $result = $conn->query($sql);
     }
     ?>
 </div>
+
 
 
 
