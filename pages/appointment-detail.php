@@ -5,7 +5,7 @@ $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $patient_id = $_POST['patient_id'] ?? '';
-  $name= $_POST['name'] ?? '';
+  $name = $_POST['name'] ?? '';
   $dob = $_POST['dob'] ?? '';
   $email = $_POST['email'] ?? '';
   $diseases = $_POST['diseases'] ?? '';
@@ -19,10 +19,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $error = "Patient and appointment date/time are required.";
   } else {
     $stmt = $conn->prepare("INSERT INTO appointment 
-      (patient_id,name, dob, email, diseases, weight, next_visit, doctor, appointment_date, appointment_time) 
+      (patient_id, name, dob, email, diseases, weight, next_visit, doctor, appointment_date, appointment_time) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-    $stmt->bind_param("issssissss", $patient_id,$name, $dob, $email, $diseases, $weight, $next_visit, $doctor, $appointment_date, $appointment_time);
+    $stmt->bind_param("issssissss", $patient_id, $name, $dob, $email, $diseases, $weight, $next_visit, $doctor, $appointment_date, $appointment_time);
 
     if ($stmt->execute()) {
       $success = "Appointment booked successfully!";
@@ -46,21 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="bg-gray-100 p-6">
   <div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
 
-<!-- Back Button -->
-  <!-- <?php
-$from = $_GET['from'] ?? 'appointments'; // default fallback
-$backLink = ($from === 'patient-profile') ? 'admin-panel.php?page=patient-profile' : '/pages/appointment';
-?>
-
-<div class="text-left mb-4">
-  <a href="<?= $backLink ?>" class="inline-block bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">
-    ← Back
-  </a>
-</div> -->
-
-
     <h2 class="text-2xl font-bold mb-4 text-center">Book Appointment</h2>
-
 
     <?php if ($success): ?>
       <div class="bg-green-100 text-green-800 p-3 rounded mb-4"><?= $success ?></div>
@@ -68,25 +54,23 @@ $backLink = ($from === 'patient-profile') ? 'admin-panel.php?page=patient-profil
       <div class="bg-red-100 text-red-800 p-3 rounded mb-4"><?= $error ?></div>
     <?php endif; ?>
 
-    <!-- Form -->
     <form method="POST" class="grid grid-cols-2 gap-4">
       <!-- Search -->
       <div class="col-span-2">
         <label class="block mb-2 font-medium">Search Patient</label>
-        <input type="text" id="patient_name" placeholder="Search by name/contact/id" class="border px-4 py-2 rounded w-full mb-2" />
+        <input type="text" id="patient_name" placeholder="Search by name/contact/id" class="border px-4 py-2 rounded w-full mb-1" />
+        <div id="noPatientMsg" class="text-red-600 text-sm hidden">Patient not found</div>
       </div>
 
-      <!-- Hidden field (inside form!) -->
+      <!-- Hidden field -->
       <input type="hidden" name="patient_id" id="patient_id">
 
       <!-- Patient Info -->
       <div>
-  <label class="block font-semibold">Name</label>
-  <input type="text" id="name_display" class="w-full bg-gray-100 px-3 py-2 rounded" disabled>
-  <input type="hidden" id="name" name="name">
-</div>
-
-
+        <label class="block font-semibold">Name</label>
+        <input type="text" id="name_display" class="w-full bg-gray-100 px-3 py-2 rounded" disabled>
+        <input type="hidden" id="name" name="name">
+      </div>
       <div>
         <label class="block font-semibold">Contact</label>
         <input type="text" id="contact" class="w-full bg-gray-100 px-3 py-2 rounded" disabled>
@@ -100,7 +84,7 @@ $backLink = ($from === 'patient-profile') ? 'admin-panel.php?page=patient-profil
         <input type="text" id="age" class="w-full bg-gray-100 px-3 py-2 rounded" disabled>
       </div>
 
-      <!-- Input fields -->
+      <!-- Input Fields -->
       <div>
         <label class="block font-semibold">Date of Birth</label>
         <input type="date" id="dob" name="dob" class="w-full px-3 py-2 border rounded">
@@ -141,7 +125,6 @@ $backLink = ($from === 'patient-profile') ? 'admin-panel.php?page=patient-profil
         <input type="date" name="next_visit" class="w-full px-3 py-2 border rounded">
       </div>
 
-      <!-- Submit -->
       <div class="col-span-2 text-right mt-4">
         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded shadow">
           Book Appointment
@@ -153,19 +136,41 @@ $backLink = ($from === 'patient-profile') ? 'admin-panel.php?page=patient-profil
   <script>
     $(document).ready(function () {
       $("#patient_name").autocomplete({
-        source: "/pages/patient-autosuggest.php",
+        source: function (request, response) {
+          $.ajax({
+            url: "/pages/patient-autosuggest.php",
+            dataType: "json",
+            data: { term: request.term },
+            success: function (data) {
+              if (data.length === 0) {
+                $("#noPatientMsg").removeClass('hidden');
+              } else {
+                $("#noPatientMsg").addClass('hidden');
+              }
+              response(data);
+            },
+            error: function () {
+              $("#noPatientMsg").removeClass('hidden').text("Error fetching data.");
+            }
+          });
+        },
         minLength: 2,
         select: function (event, ui) {
           $("#patient_id").val(ui.item.id);
-          $.get('/pages/fetch-patient.php?id=' + ui.item.id, function (data) {
-  const p = JSON.parse(data);
-  $('#name_display').val(p.name);     // for user view
-  $('#name').val(p.name);             // for form submission
-  $('#contact').val(p.contact);
-  $('#gender').val(p.gender);
-  $('#age').val(p.age);
-});
+          $("#noPatientMsg").addClass('hidden');
 
+          $.get('/pages/fetch-patient.php?id=' + ui.item.id, function (data) {
+            try {
+              const p = JSON.parse(data);
+              $('#name_display').val(p.name);
+              $('#name').val(p.name);
+              $('#contact').val(p.contact);
+              $('#gender').val(p.gender);
+              $('#age').val(p.age);
+            } catch (e) {
+              $("#noPatientMsg").removeClass('hidden').text("Error loading patient details.");
+            }
+          });
         }
       });
     });
