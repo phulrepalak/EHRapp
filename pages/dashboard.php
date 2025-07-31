@@ -46,7 +46,7 @@ $sql = "SELECT p.name, a.appointment_time, a.appointment_date
         FROM appointment a
         JOIN patient p ON a.patient_id = p.id
         ORDER BY a.appointment_date DESC, a.appointment_time DESC
-        LIMIT 5";
+        LIMIT 20";
 
 $result = $conn->query($sql);
 ?>
