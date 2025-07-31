@@ -31,10 +31,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   }
 }
+
+// Fetch doctor list
+$doctors = [];
+$docResult = $conn->query("SELECT name FROM doctors ORDER BY name");
+while ($docRow = $docResult->fetch_assoc()) {
+  $doctors[] = $docRow['name'];
+}
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <title>Book Appointment</title>
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
@@ -58,7 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <!-- Search -->
       <div class="col-span-2">
         <label class="block mb-2 font-medium">Search Patient</label>
-        <input type="text" id="patient_name" placeholder="Search by name/contact/id" class="border px-4 py-2 rounded w-full mb-1" />
+        <input type="text" id="patient_name" placeholder="Search by name/contact/id"
+          class="border px-4 py-2 rounded w-full mb-1" />
         <div id="noPatientMsg" class="text-red-600 text-sm hidden">Patient not found</div>
       </div>
 
@@ -98,16 +108,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="text" name="diseases" class="w-full px-3 py-2 border rounded">
       </div>
       <div>
-        <label class="block font-semibold">Doctor</label>
+        <label class="text-gray-600 font-medium">Doctor</label>
         <select name="doctor" id="doctor" class="w-full px-3 py-2 border rounded" required>
           <option value="">-- Select Doctor --</option>
-          <option value="Dr. Mehta">Dr. Mehta</option>
-          <option value="Dr. Sharma">Dr. Sharma</option>
-          <option value="Dr. Verma">Dr. Verma</option>
-          <option value="Dr. Reddy">Dr. Reddy</option>
-          <option value="Dr. Iyer">Dr. Iyer</option>
+          <?php foreach ($doctors as $docName): ?>
+            <option value="<?= htmlspecialchars($docName) ?>">
+              <?= htmlspecialchars($docName) ?>
+            </option>
+          <?php endforeach; ?>
         </select>
       </div>
+
+
       <div>
         <label class="block font-semibold">Appointment Date</label>
         <input type="date" name="appointment_date" class="w-full px-3 py-2 border rounded" required>
@@ -173,7 +185,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           });
         }
       });
-    });
+    }); 
   </script>
 </body>
+
 </html>

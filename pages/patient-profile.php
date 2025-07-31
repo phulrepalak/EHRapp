@@ -6,6 +6,13 @@ $success = '';
 $error = '';
 $row = [];
 
+// Fetch doctor list
+$doctors = [];
+$docResult = $conn->query("SELECT name FROM doctors ORDER BY name");
+while ($docRow = $docResult->fetch_assoc()) {
+    $doctors[] = $docRow['name'];
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     $conn->begin_transaction();
 
@@ -52,6 +59,7 @@ if ($patient_id && is_numeric($patient_id)) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>My Page</title>
@@ -65,7 +73,7 @@ if ($patient_id && is_numeric($patient_id)) {
         <p class="text-red-600 font-medium mb-4"><?= $error ?></p>
     <?php endif; ?>
 
-       <!-- Back Button
+    <!-- Back Button
     <div class="text-left mb-4">
       <a href="admin-panel.php?page=patients" class="inline-block bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">
         ← Back
@@ -100,16 +108,15 @@ if ($patient_id && is_numeric($patient_id)) {
                 class="w-full px-3 py-2 border rounded bg-gray-100">
         </div>
 
-       <div class="col-span-1">
-  <label for="gender" class="block font-semibold mb-1">Gender</label>
-  <select name="gender" id="gender"
-          class="w-full px-4 py-2 border border-gray-300 rounded bg-gray-100"
-          disabled>
-    <option value="Male" <?= $row['gender'] == 'Male' ? 'selected' : '' ?>>Male</option>
-    <option value="Female" <?= $row['gender'] == 'Female' ? 'selected' : '' ?>>Female</option>
-    <option value="Other" <?= $row['gender'] == 'Other' ? 'selected' : '' ?>>Other</option>
-  </select>
-</div>
+        <div class="col-span-1">
+            <label for="gender" class="block font-semibold mb-1">Gender</label>
+            <select name="gender" id="gender" class="w-full px-4 py-2 border border-gray-300 rounded bg-gray-100"
+                disabled>
+                <option value="Male" <?= $row['gender'] == 'Male' ? 'selected' : '' ?>>Male</option>
+                <option value="Female" <?= $row['gender'] == 'Female' ? 'selected' : '' ?>>Female</option>
+                <option value="Other" <?= $row['gender'] == 'Other' ? 'selected' : '' ?>>Other</option>
+            </select>
+        </div>
 
 
 
@@ -136,12 +143,18 @@ if ($patient_id && is_numeric($patient_id)) {
             <input type="text" name="diseases" readonly value="<?= htmlspecialchars($row['diseases']) ?>"
                 class="w-full px-3 py-2 border rounded bg-gray-100">
         </div>
-
         <div>
             <label class="text-gray-600 font-medium">Doctor</label>
-            <input type="text" name="doctor" readonly value="<?= htmlspecialchars($row['doctor']) ?>"
-                class="w-full px-3 py-2 border rounded bg-gray-100">
+            <select name="doctor" id="doctor" class="w-full px-3 py-2 border rounded bg-gray-100" disabled>
+                <option value="">-- Select Doctor --</option>
+                <?php foreach ($doctors as $docName): ?>
+                    <option value="<?= htmlspecialchars($docName) ?>" <?= ($row['doctor'] == $docName) ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($docName) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
         </div>
+
 
         <div>
             <label class="text-gray-600 font-medium">Appointment Date</label>
@@ -173,37 +186,37 @@ if ($patient_id && is_numeric($patient_id)) {
                 class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 hidden">Save</button>
         </div>
     </form>
-     
+
     <!-- Documents Section -->
     <h3 class="text-xl font-bold text-gray-800 mt-10 mb-4">Uploaded Documents</h3>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <?php while ($doc = $documents->fetch_assoc()): 
-          $filePath = '/' . $doc['filepath'];
+        <?php while ($doc = $documents->fetch_assoc()):
+            $filePath = '/' . $doc['filepath'];
 
             $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
             $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'webp']);
             $isPdf = $ext === 'pdf';
-        ?>
-        <div class="bg-white rounded-xl border border-gray-200 shadow hover:shadow-md transition">
-            <button onclick="openPreview('<?= $filePath ?>')" class="w-full focus:outline-none">
-                <?php if ($isImage): ?>
-                    <img src="<?= $filePath ?>" alt="Document" class="w-full h-64 object-cover rounded-t-xl">
-                <?php elseif ($isPdf): ?>
-                    <div class="w-full h-64 flex items-center justify-center bg-gray-100 text-lg font-medium text-gray-700">
-                        PDF Document
-                    </div>
-                <?php endif; ?>
-            </button>
-            <div class="p-4 space-y-1">
-                <p class="text-gray-800 font-semibold">📄 <?= htmlspecialchars($doc['report_name']) ?></p>
-                <p class="text-sm text-gray-600">Uploaded by: <?= htmlspecialchars($doc['uploaded_by']) ?></p>
-                <p class="text-sm text-gray-500"><?= date("d M Y, h:i A", strtotime($doc['uploaded_at'])) ?></p>
-                <form method="POST" action="/pages/delete_document.php" onsubmit="return confirm('Are you sure?')">
-                    <input type="hidden" name="document_id" value="<?= $doc['id'] ?>">
-                    <button type="submit" class="text-red-500 hover:underline text-sm">Delete</button>
-                </form>
+            ?>
+            <div class="bg-white rounded-xl border border-gray-200 shadow hover:shadow-md transition">
+                <button onclick="openPreview('<?= $filePath ?>')" class="w-full focus:outline-none">
+                    <?php if ($isImage): ?>
+                        <img src="<?= $filePath ?>" alt="Document" class="w-full h-64 object-cover rounded-t-xl">
+                    <?php elseif ($isPdf): ?>
+                        <div class="w-full h-64 flex items-center justify-center bg-gray-100 text-lg font-medium text-gray-700">
+                            PDF Document
+                        </div>
+                    <?php endif; ?>
+                </button>
+                <div class="p-4 space-y-1">
+                    <p class="text-gray-800 font-semibold">📄 <?= htmlspecialchars($doc['report_name']) ?></p>
+                    <p class="text-sm text-gray-600">Uploaded by: <?= htmlspecialchars($doc['uploaded_by']) ?></p>
+                    <p class="text-sm text-gray-500"><?= date("d M Y, h:i A", strtotime($doc['uploaded_at'])) ?></p>
+                    <form method="POST" action="/pages/delete_document.php" onsubmit="return confirm('Are you sure?')">
+                        <input type="hidden" name="document_id" value="<?= $doc['id'] ?>">
+                        <button type="submit" class="text-red-500 hover:underline text-sm">Delete</button>
+                    </form>
+                </div>
             </div>
-        </div>
         <?php endwhile; ?>
     </div>
 </div>
