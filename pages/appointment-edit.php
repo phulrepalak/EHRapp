@@ -68,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 py-10">
+    
 
 <div class="max-w-3xl mx-auto bg-white p-8 shadow-md rounded-lg">
     <h2 class="text-2xl font-bold mb-6 text-center text-blue-700"> Appointment Details</h2>

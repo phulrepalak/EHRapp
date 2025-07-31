@@ -46,14 +46,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="bg-gray-100 p-6">
   <div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
 
-    <!-- Back Button -->
-    <div class="text-left mb-4">
-      <a href="admin-panel.php?page=appointments" class="inline-block bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">
-        ← Back
-      </a>
-    </div>
+<!-- Back Button -->
+  <!-- <?php
+$from = $_GET['from'] ?? 'appointments'; // default fallback
+$backLink = ($from === 'patient-profile') ? 'admin-panel.php?page=patient-profile' : '/pages/appointment';
+?>
 
-    <h2 class="text-2xl font-bold mb-4">Book Appointment</h2>
+<div class="text-left mb-4">
+  <a href="<?= $backLink ?>" class="inline-block bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">
+    ← Back
+  </a>
+</div> -->
+
+
+    <h2 class="text-2xl font-bold mb-4 text-center">Book Appointment</h2>
+
 
     <?php if ($success): ?>
       <div class="bg-green-100 text-green-800 p-3 rounded mb-4"><?= $success ?></div>
@@ -73,8 +80,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <input type="hidden" name="patient_id" id="patient_id">
 
       <!-- Patient Info -->
-      <input type="text" id="name_display" class="w-full bg-gray-100 px-3 py-2 rounded" disabled>
-<input type="hidden" id="name" name="name">
+      <div>
+  <label class="block font-semibold">Name</label>
+  <input type="text" id="name_display" class="w-full bg-gray-100 px-3 py-2 rounded" disabled>
+  <input type="hidden" id="name" name="name">
+</div>
+
 
       <div>
         <label class="block font-semibold">Contact</label>

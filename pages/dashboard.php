@@ -59,7 +59,7 @@ $result = $conn->query($sql);
             ?>
             <div class="px-4 py-2 border-b">
                 <p class="font-medium text-lg"><?php echo htmlspecialchars($row['name']); ?></p>
-                <p class="font-thin text-sm text-gray-600">Time - <?php echo date("h:i A", strtotime($row['time'])); ?></p>
+                <p class="font-thin text-sm text-gray-600">Time - <?php echo date("h:i A", strtotime($row['appointment_time'])); ?></p>
             </div>
             <?php
         }

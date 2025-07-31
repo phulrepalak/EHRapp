@@ -17,7 +17,7 @@ $result = $conn->query($sql);
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <?php while ($row = $result->fetch_assoc()): ?>
             <?php
-            $filePath = $row['filepath']; // Use filepath from DB
+            $filePath = 'uploads/' . basename($row['file_name']);
             $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
             $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'webp']);
             $isPdf = ($extension === 'pdf');
@@ -29,10 +29,9 @@ $result = $conn->query($sql);
                 <button
                     onclick="openPreview('<?= htmlspecialchars($filePath) ?>', '<?= htmlspecialchars($row['name']) ?>', '<?= $row['patient_id'] ?>', '<?= htmlspecialchars($row['uploaded_by']) ?>', '<?= date('d M Y, h:i A', strtotime($row['uploaded_at'])) ?>', '<?= htmlspecialchars($row['report_name']) ?>')"
                     class="w-full focus:outline-none">
-
                     <?php if ($isImage): ?>
                         <img src="<?= htmlspecialchars($filePath) ?>" alt="Document"
-                            class="w-full h-64 object-cover rounded-t-xl">
+                             class="w-full h-64 object-cover rounded-t-xl">
                     <?php else: ?>
                         <div class="w-full h-64 flex items-center justify-center bg-gray-100 text-lg font-medium text-gray-700">
                             PDF Document
@@ -40,12 +39,10 @@ $result = $conn->query($sql);
                     <?php endif; ?>
                 </button>
                 <div class="p-4 space-y-1">
-                    <a href="pages\patient-profile.php?id=<?= $row['patient_id'] ?>" class="text-blue-600 hover:underline">
+                    <a href="pages/patient-profile.php?id=<?= $row['patient_id'] ?>" class="text-blue-600 hover:underline">
                         👤 <?= htmlspecialchars($row['name']) ?>
                     </a>
-
-                    <p class="text-sm text-gray-600">Report: <strong><?= htmlspecialchars($row['report_name']) ?></strong>
-                    </p>
+                    <p class="text-sm text-gray-600">Report: <strong><?= htmlspecialchars($row['report_name']) ?></strong></p>
                     <p class="text-sm text-gray-600">Uploaded by: <?= htmlspecialchars($row['uploaded_by']) ?></p>
                     <p class="text-sm text-gray-500"><?= date("d M Y, h:i A", strtotime($row['uploaded_at'])) ?></p>
                 </div>
@@ -56,21 +53,17 @@ $result = $conn->query($sql);
 
 <!-- Preview Modal -->
 <div id="previewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-    <div class="bg-white w-full max-w-4xl mx-auto rounded-xl shadow-xl overflow-hidden">
-        <div class="flex justify-between items-center px-6 py-4 border-b">
-            <h3 class="text-xl font-semibold text-gray-800">Document Preview</h3>
-            <button onclick="closePreview()" class="text-gray-500 hover:text-red-500 text-xl">&times;</button>
+    <div class="bg-white p-6 rounded-md w-full max-w-3xl relative">
+        <button onclick="closePreview()" class="absolute top-2 right-2 text-gray-500 hover:text-black text-2xl font-bold">✖</button>
+        <h2 class="text-xl font-semibold mb-4">Document Preview</h2>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <p><strong>Patient Name:</strong> <span id="modalPatientName"></span></p>
+            <p><strong>Patient ID:</strong> <span id="modalPatientId"></span></p>
+            <p><strong>Uploaded By:</strong> <span id="modalUploadedBy"></span></p>
+            <p><strong>Uploaded At:</strong> <span id="modalUploadedAt"></span></p>
+            <p><strong>Report Name:</strong> <span id="modalReportName"></span></p>
         </div>
-        <div class="p-6 max-h-[70vh] overflow-y-auto">
-            <div id="previewContent" class="mb-6"></div>
-            <div class="text-sm space-y-1 text-gray-700">
-                <p><strong>Patient ID:</strong> <span id="modalPatientId"></span></p>
-                <p><strong>Patient Name:</strong> <span id="modalPatientName"></span></p>
-                <p><strong>Uploaded By:</strong> <span id="modalUploadedBy"></span></p>
-                <p><strong>Uploaded At:</strong> <span id="modalUploadedAt"></span></p>
-                <p><strong>Report Name:</strong> <span id="modalReportName"></span></p>
-            </div>
-        </div>
+        <div id="previewContent" class="w-full"></div>
     </div>
 </div>
 

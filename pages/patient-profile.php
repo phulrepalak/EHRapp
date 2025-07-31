@@ -65,6 +65,13 @@ if ($patient_id && is_numeric($patient_id)) {
         <p class="text-red-600 font-medium mb-4"><?= $error ?></p>
     <?php endif; ?>
 
+       <!-- Back Button
+    <div class="text-left mb-4">
+      <a href="admin-panel.php?page=patients" class="inline-block bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">
+        ← Back
+      </a>
+    </div> -->
+
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-800">Patient Profile</h2>
         <div class="flex gap-3">
@@ -166,7 +173,7 @@ if ($patient_id && is_numeric($patient_id)) {
                 class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 hidden">Save</button>
         </div>
     </form>
-
+     
     <!-- Documents Section -->
     <h3 class="text-xl font-bold text-gray-800 mt-10 mb-4">Uploaded Documents</h3>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
