@@ -1,152 +1,171 @@
 <?php
 include 'db.php';
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+$success = '';
+$error = '';
 
-$patient_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $patient_id = $_POST['patient_id'];
+  $dob = $_POST['dob'];
+  $email = $_POST['email'];
+  $diseases = $_POST['diseases'];
+  $weight = $_POST['weight'];
+  $next_visit = $_POST['next_visit'];
+  $doctor = $_POST['doctor'];
 
-$message = "";
+  $stmt = $conn->prepare("INSERT INTO appointment (patient_id, dob, email, diseases, weight, next_visit, doctor)
+                            VALUES (?, ?, ?, ?, ?, ?, ?)");
+  $stmt->bind_param("isssiss", $patient_id, $dob, $email, $diseases, $weight, $next_visit, $doctor);
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && $patient_id > 0) {
-    $name    = trim($_POST['name']);
-    $email   = trim($_POST['email']);
-    $contact = trim($_POST['contact']);
-    $doctor  = trim($_POST['doctor']);
-    $date    = $_POST['date'];
-    $time    = $_POST['time'];
-
-    if ($name && $email && $doctor && $date && $time) {
-        // Update patient table
-        $stmt1 = $conn->prepare("UPDATE patient SET name=?, contact=? WHERE id=?");
-        $stmt1->bind_param("ssi", $name, $contact, $patient_id);
-        $stmt1->execute();
-
-        // Check if appointment exists
-        $check = $conn->prepare("SELECT id FROM appointment WHERE patient_id=?");
-        $check->bind_param("i", $patient_id);
-        $check->execute();
-        $check_result = $check->get_result();
-
-        if ($check_result->num_rows > 0) {
-            // Update existing appointment
-            $stmt2 = $conn->prepare("UPDATE appointment SET email=?, doctor_name=?, date=?, time=? WHERE patient_id=?");
-            $stmt2->bind_param("ssssi", $email, $doctor, $date, $time, $patient_id);
-            if ($stmt2->execute()) {
-                $message = "Appointment updated successfully.";
-            } else {
-                $message = "Failed to update appointment.";
-            }
-        } else {
-            // Insert new appointment
-            $stmt3 = $conn->prepare("INSERT INTO appointment (patient_id, email, doctor_name, date, time) VALUES (?, ?, ?, ?, ?)");
-            $stmt3->bind_param("issss", $patient_id, $email, $doctor, $date, $time);
-            if ($stmt3->execute()) {
-                $message = "Appointment saved successfully.";
-            } else {
-                $message = "Failed to save appointment.";   
-            }
-        }
-    } else {
-        $message = "All fields are required.";
-    }
-}
-
-// Fetch info to display
-$data = [];
-if ($patient_id > 0) {
-    $stmt = $conn->prepare("SELECT p.name, p.contact, a.email, a.doctor_name, a.date, a.time
-                            FROM patient p
-                            LEFT JOIN appointment a ON p.id = a.patient_id
-                            WHERE p.id = ?");
-    $stmt->bind_param("i", $patient_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $data = $result->fetch_assoc();
+  if ($stmt->execute()) {
+    $success = " Appointment booked successfully!";
+  } else {
+    $error = " Failed to book appointment.";
+  }
 }
 ?>
 
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+  <title>Book Appointment</title>
+  <!-- jQuery UI CSS -->
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 
-<!-- HTML + Tailwind UI -->
-<div class="w-full h-full border rounded-xl p-4 bg-white">
-    <div class="w-full h-auto mx-auto border rounded-xl p-6 bg-white shadow-md">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-semibold text-gray-800">Appointment Detail</h3>
-            <button id="editBtn" type="button" class="cursor-pointer bg-blue-500 text-white px-4 py-1 rounded-md text-sm">
-                Edit
-            </button>
-        </div>
+  <!-- jQuery + jQuery UI JS -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
 
-        <?php if ($message): ?>
-            <div class="mb-4 text-sm text-green-600 font-semibold">
-                <?= htmlspecialchars($message) ?>
-            </div>
-        <?php endif; ?>
+<body class="bg-gray-100 p-6">
+  <div class="max-w-2xl mx-auto bg-white p-6 rounded shadow">
+    <h2 class="text-2xl font-bold mb-4"> Book Appointment</h2>
 
-        <div class="h-px bg-gray-300 mb-4"></div>
+    <?php if ($success): ?>
+      <div class="bg-green-100 text-green-800 p-3 rounded mb-4"><?= $success ?></div>
+    <?php elseif ($error): ?>
+      <div class="bg-red-100 text-red-800 p-3 rounded mb-4"><?= $error ?></div>
+    <?php endif; ?>
 
-        <form id="profileForm" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="flex flex-col">
-                <label class="font-semibold mb-1">Name</label>
-                <input name="name" value="<?= htmlspecialchars($data['name'] ?? '') ?>" type="text" readonly class="read-only:bg-gray-100 border border-gray-300 rounded px-3 py-1 text-sm" />
-            </div>
+    <label class="block mb-2 font-medium">Search Patient</label>
+    <!-- Input Field -->
+    <input type="text" id="patient_name" placeholder="Search by name/contact/id"
+      class="border px-4 py-2 rounded w-full" />
+    <input type="hidden" id="patient_id">
+   
+    <form method="POST" class="grid grid-cols-2 gap-4 mt-4">
+      <input type="hidden" name="patient_id" id="patient_id">
 
-            <div class="flex flex-col">
-                <label class="font-semibold mb-1">Doctor</label>
-                <input name="doctor" value="<?= htmlspecialchars($data['doctor_name'] ?? '') ?>" type="text" readonly class="read-only:bg-gray-100 border border-gray-300 rounded px-3 py-1 text-sm" />
-            </div>
+      <!-- Name & Contact -->
+      <div>
+        <label class="block font-semibold text-gray-700 mb-1"> Name</label>
+        <input type="text" id="name" class="w-full bg-gray-100 px-3 py-2 rounded" disabled>
+      </div>
+      <div>
+        <label class="block font-semibold text-gray-700 mb-1"> Contact</label>
+        <input type="text" id="contact" class="w-full bg-gray-100 px-3 py-2 rounded" disabled>
+      </div>
 
-            <div class="flex flex-col">
-                <label class="font-semibold mb-1">Date</label>
-                <input name="date" value="<?= htmlspecialchars($data['date'] ?? '') ?>" type="date" readonly class="read-only:bg-gray-100 border border-gray-300 rounded px-3 py-1 text-sm" />
-            </div>
+      <!-- Gender & Age -->
+      <div>
+        <label class="block font-semibold text-gray-700 mb-1"> Gender</label>
+        <input type="text" id="gender" class="w-full bg-gray-100 px-3 py-2 rounded" disabled>
+      </div>
+      <div>
+        <label class="block font-semibold text-gray-700 mb-1"> Age</label>
+        <input type="text" id="age" class="w-full bg-gray-100 px-3 py-2 rounded" disabled>
+      </div>
 
-            <div class="flex flex-col">
-                <label class="font-semibold mb-1">Email</label>
-                <input name="email" value="<?= htmlspecialchars($data['email'] ?? '') ?>" type="email" readonly class="read-only:bg-gray-100 border border-gray-300 rounded px-3 py-1 text-sm" />
-            </div>
+      <!-- DOB & Email -->
+      <div>
+        <label class="block font-semibold text-gray-700 mb-1"> Date of Birth</label>
+        <input type="date" id="dob" name="dob" class="w-full px-3 py-2 border rounded">
+      </div>
+      <div>
+        <label class="block font-semibold text-gray-700 mb-1"> Email</label>
+        <input type="email" id="email" name="email" class="w-full px-3 py-2 border rounded">
+      </div>
+      <!-- Diseases & Doctor -->
+      <div>
+        <label class="block font-semibold text-gray-700 mb-1"> Diseases</label>
+        <input type="text" name="diseases" class="w-full px-3 py-2 border rounded">
+      </div>
+      <div>
+        <label class="block font-semibold text-gray-700 mb-1">Select Doctor</label>
+        <select name="doctor" id="doctor" class="w-full px-3 py-2 border rounded" required>
+          <option value="">-- Select Doctor --</option>
+          <option value="Dr. Mehta">Dr. Mehta</option>
+          <option value="Dr. Sharma">Dr. Sharma</option>
+          <option value="Dr. Verma">Dr. Verma</option>
+          <option value="Dr. Reddy">Dr. Reddy</option>
+          <option value="Dr. Iyer">Dr. Iyer</option>
+        </select>
+      </div>
 
-            <div class="flex flex-col">
-                <label class="font-semibold mb-1">Contact</label>
-                <input name="contact" value="<?= htmlspecialchars($data['contact'] ?? '') ?>" type="tel" readonly class="read-only:bg-gray-100 border border-gray-300 rounded px-3 py-1 text-sm" />
-            </div>
+      <!-- Appointment Date & Time -->
+      <div>
+        <label class="block font-semibold text-gray-700 mb-1">Appointment Date</label>
+        <input type="date" name="appointment_date" class="w-full px-3 py-2 border rounded" required>
+      </div>
+      <div>
+        <label class="block font-semibold text-gray-700 mb-1">Appointment Time</label>
+        <input type="time" name="appointment_time" class="w-full px-3 py-2 border rounded" required>
+      </div>
+      <!-- Next Visit & Weight -->
+      <div>
+        <label class="block font-semibold text-gray-700 mb-1"> Weight (kg)</label>
+        <input type="number" name="weight" class="w-full px-3 py-2 border rounded">
+      </div>
+      <div>
+        <label class="block font-semibold text-gray-700 mb-1">Next Visit</label>
+        <input type="date" name="next_visit" class="w-full px-3 py-2 border rounded">
+      </div>
 
-            <div class="flex flex-col">
-                <label class="font-semibold mb-1">Time</label>
-                <input name="time" value="<?= htmlspecialchars($data['time'] ?? '') ?>" type="time" readonly class="read-only:bg-gray-100 border border-gray-300 rounded px-3 py-1 text-sm" />
-            </div>
+  <!-- Submit Button -->
+  <div class="col-span-2 text-right mt-4">
+    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded shadow">
+      Book Appointment
+    </button>
+  </div>
+    </form>
+  </div>
 
-            <button type="submit" id="saveBtn" class="hidden col-span-1 md:col-span-3 mt-2 bg-green-600 text-white px-4 py-2 rounded">
-                Save Changes
-            </button>
-        </form>
-    </div>
-</div>
-
-<script>
-    const editBtn = document.getElementById('editBtn');
-    const saveBtn = document.getElementById('saveBtn');
-    const inputs = document.querySelectorAll('#profileForm input');
-
-    let isEditing = false;
-
-    editBtn.addEventListener('click', () => {
-        isEditing = !isEditing;
-
-        inputs.forEach(input => {
-            input.readOnly = !isEditing;
-            input.classList.toggle('read-only:bg-gray-100', !isEditing);
-            input.classList.toggle('border-blue-500', isEditing);
-        });
-
-        if (isEditing) {
-            editBtn.textContent = 'Cancel';
-            editBtn.classList.replace('bg-blue-500', 'bg-red-500');
-            saveBtn.classList.remove('hidden');
-        } else {
-            editBtn.textContent = 'Edit';
-            editBtn.classList.replace('bg-red-500', 'bg-blue-500');
-            saveBtn.classList.add('hidden');
+  <script>
+    $(document).ready(function () {
+      $("#patient_name").autocomplete({
+        source: "patient-autosuggest.php",
+        minLength: 2,
+        select: function (event, ui) {
+          $("#patient_id").val(ui.item.id);
+          $("#contact").val(ui.item.contact);
         }
+      });
     });
-</script>
+
+    $(document).on('click', '#suggestions li', function () {
+      const id = $(this).data('id');
+      $('#patient_id').val(id);
+      $('#suggestions').empty().addClass('hidden');
+
+      $.get('fetch-patient.php?id=' + id, function (data) {
+        const p = JSON.parse(data);
+        $('#name').val(p.name);
+        $('#contact').val(p.contact);
+        $('#gender').val(p.gender);
+        $('#age').val(p.age);
+      });
+
+      $('#searchInput').val($(this).text());
+    });
+
+    $(document).click(function (e) {
+      if (!$(e.target).closest('#searchInput, #suggestions').length) {
+        $('#suggestions').addClass('hidden');
+      }
+    });
+
+  </script>
+</body>
+
+</html>
