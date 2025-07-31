@@ -2,29 +2,20 @@
 include 'db.php';
 
 $term = $_GET['term'] ?? '';
+$term = $conn->real_escape_string($term);
 
-if (!$term) {
-    echo json_encode([]);
-    exit;
-}
+$sql = "SELECT id, name, contact FROM patient WHERE name LIKE '%$term%' OR contact LIKE '%$term%' LIMIT 10";
+$result = $conn->query($sql);
 
-$term = "%$term%";
+$suggestions = [];
 
-// Search by name, contact, or ID
-$stmt = $conn->prepare("SELECT id, name, contact FROM patient WHERE name LIKE ? OR contact LIKE ? OR id LIKE ?");
-$stmt->bind_param("sss", $term, $term, $term);
-$stmt->execute();
-$result = $stmt->get_result();
-
-$data = [];
 while ($row = $result->fetch_assoc()) {
-    $data[] = [
-        'label' => $row['name'] . ' (' . $row['contact'] . ')',
-        'value' => $row['name'],
-        'id' => $row['id'],
-        'contact' => $row['contact']
-    ];
+  $suggestions[] = [
+    'id' => $row['id'],
+    'label' => $row['name'] . ' (' . $row['contact'] . ')',
+    'value' => $row['name']
+  ];
 }
 
-echo json_encode($data);
+echo json_encode($suggestions);
 ?>
