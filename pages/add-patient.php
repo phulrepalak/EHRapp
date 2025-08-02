@@ -10,20 +10,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Simple validation    
     if (!empty($name) && $age > 0 && !empty($phone) && !empty($gender)) {
-        $stmt = $conn->prepare("INSERT INTO patient (name, age, contact, gender) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("siss", $name, $age, $phone, $gender);
+        // Check for existing patient with same data
+        $checkQuery = $conn->prepare("SELECT id FROM patient WHERE name = ? AND age = ? AND contact = ? AND gender = ?");
+        $checkQuery->bind_param("siss", $name, $age, $phone, $gender);
+        $checkQuery->execute();
+        $checkQuery->store_result();
 
-        if ($stmt->execute()) {
-            $success = "Patient added successfully.";
+        if ($checkQuery->num_rows > 0) {
+            $error = "Patient already exists with the same details.";
         } else {
-            $error = "Error adding patient: " . $conn->error;
+            // If no duplicate found, insert new record
+            $stmt = $conn->prepare("INSERT INTO patient (name, age, contact, gender) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("siss", $name, $age, $phone, $gender);
+
+            if ($stmt->execute()) {
+                $success = "Patient added successfully.";
+            } else {
+                $error = "Error adding patient: " . $conn->error;
+            }
+
+            $stmt->close();
         }
 
-        $stmt->close();
+        $checkQuery->close();
     } else {
         $error = "Please fill all fields correctly.";
     }
 }
+
 // echoing the message: Patient added sucessfully
  if (!empty($success)): ?>
     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
