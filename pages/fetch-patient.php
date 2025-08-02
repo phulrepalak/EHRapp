@@ -1,5 +1,6 @@
 <?php
 include 'db.php';
+
 $id = $_GET['id'] ?? '';
 if ($id) {
     $stmt = $conn->prepare("SELECT * FROM patient WHERE id = ?");

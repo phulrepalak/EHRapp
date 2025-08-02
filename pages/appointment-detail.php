@@ -146,47 +146,62 @@ while ($docRow = $docResult->fetch_assoc()) {
   </div>
 
   <script>
-    $(document).ready(function () {
-      $("#patient_name").autocomplete({
-        source: function (request, response) {
-          $.ajax({
-            url: "/pages/patient-autosuggest.php",
-            dataType: "json",
-            data: { term: request.term },
-            success: function (data) {
-              if (data.length === 0) {
-                $("#noPatientMsg").removeClass('hidden');
-              } else {
-                $("#noPatientMsg").addClass('hidden');
-              }
-              response(data);
-            },
-            error: function () {
-              $("#noPatientMsg").removeClass('hidden').text("Error fetching data.");
-            }
-          });
-        },
-        minLength: 2,
-        select: function (event, ui) {
-          $("#patient_id").val(ui.item.id);
-          $("#noPatientMsg").addClass('hidden');
+   
+$(document).ready(function () {
+  let typingTimer;
+  const doneTypingInterval = 400;
 
-          $.get('/pages/fetch-patient.php?id=' + ui.item.id, function (data) {
-            try {
-              const p = JSON.parse(data);
-              $('#name_display').val(p.name);
-              $('#name').val(p.name);
-              $('#contact').val(p.contact);
-              $('#gender').val(p.gender);
-              $('#age').val(p.age);
-            } catch (e) {
-              $("#noPatientMsg").removeClass('hidden').text("Error loading patient details.");
-            }
-          });
+  $("#patient_name").on('input', function () {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => {
+      $("#noPatientMsg").addClass('hidden').text("Patient not found");
+    }, doneTypingInterval);
+  });
+
+  $("#patient_name").autocomplete({
+    source: function (request, response) {
+      $.ajax({
+        url: "/pages/patient-autosuggest.php",
+        dataType: "json",
+        data: { term: request.term },
+        success: function (data) {
+          if (data.length === 0) {
+            $("#noPatientMsg").removeClass('hidden').text("Patient not found");
+          } else {
+            $("#noPatientMsg").addClass('hidden');
+          }
+          response(data);
+        },
+        error: function () {
+          $("#noPatientMsg").removeClass('hidden').text("Error fetching patient data.");
         }
       });
-    }); 
-  </script>
+    },
+    minLength: 2,
+    select: function (event, ui) {
+      $("#patient_id").val(ui.item.id);
+      $("#noPatientMsg").addClass('hidden');
+
+      // Fetch full patient details
+      $.get('/pages/fetch-patient.php?id=' + ui.item.id, function (data) {
+        try {
+          const p = JSON.parse(data);
+          $('#name_display').val(p.name);
+          $('#name').val(p.name);
+          $('#contact').val(p.contact);
+          $('#gender').val(p.gender);
+          $('#age').val(p.age);
+          $('#dob').val(p.dob);
+          $('#email').val(p.email);
+        } catch (e) {
+          $("#noPatientMsg").removeClass('hidden').text("Error loading patient details.");
+        }
+      });
+    }
+  });
+});
+</script>
+
 </body>
 
 </html>
