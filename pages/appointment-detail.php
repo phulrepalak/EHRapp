@@ -145,62 +145,81 @@ while ($docRow = $docResult->fetch_assoc()) {
     </form>
   </div>
 
-  <script>
-   
-$(document).ready(function () {
-  let typingTimer;
-  const doneTypingInterval = 400;
+ <script>
+  $(document).ready(function () {
+    let typingTimer;
+    const doneTypingInterval = 400;
 
-  $("#patient_name").on('input', function () {
-    clearTimeout(typingTimer);
-    typingTimer = setTimeout(() => {
-      $("#noPatientMsg").addClass('hidden').text("Patient not found");
-    }, doneTypingInterval);
-  });
-
-  $("#patient_name").autocomplete({
-    source: function (request, response) {
-      $.ajax({
-        url: "/pages/patient-autosuggest.php",
-        dataType: "json",
-        data: { term: request.term },
-        success: function (data) {
-          if (data.length === 0) {
-            $("#noPatientMsg").removeClass('hidden').text("Patient not found");
-          } else {
-            $("#noPatientMsg").addClass('hidden');
-          }
-          response(data);
-        },
-        error: function () {
-          $("#noPatientMsg").removeClass('hidden').text("Error fetching patient data.");
-        }
-      });
-    },
-    minLength: 2,
-    select: function (event, ui) {
-      $("#patient_id").val(ui.item.id);
-      $("#noPatientMsg").addClass('hidden');
-
-      // Fetch full patient details
-      $.get('/pages/fetch-patient.php?id=' + ui.item.id, function (data) {
-        try {
-          const p = JSON.parse(data);
-          $('#name_display').val(p.name);
-          $('#name').val(p.name);
-          $('#contact').val(p.contact);
-          $('#gender').val(p.gender);
-          $('#age').val(p.age);
-          $('#dob').val(p.dob);
-          $('#email').val(p.email);
-        } catch (e) {
-          $("#noPatientMsg").removeClass('hidden').text("Error loading patient details.");
-        }
-      });
+    function clearPatientDetails() {
+      $('#patient_id').val('');
+      $('#name_display').val('');
+      $('#name').val('');
+      $('#contact').val('');
+      $('#gender').val('');
+      $('#age').val('');
+      $('#dob').val('');
+      $('#email').val('');
     }
+
+    $("#patient_name").on('input', function () {
+      clearTimeout(typingTimer);
+
+      // As soon as user types, clear old data
+      clearPatientDetails();
+      $("#noPatientMsg").addClass('hidden').text("Patient not found");
+
+      typingTimer = setTimeout(() => {
+        // Optional: could add a loader or 'Searching...' indicator here
+      }, doneTypingInterval);
+    });
+
+    $("#patient_name").autocomplete({
+      source: function (request, response) {
+        $.ajax({
+          url: "/pages/patient-autosuggest.php",
+          dataType: "json",
+          data: { term: request.term },
+          success: function (data) {
+            if (data.length === 0) {
+              clearPatientDetails();
+              $("#noPatientMsg").removeClass('hidden').text("Patient not found");
+            } else {
+              $("#noPatientMsg").addClass('hidden');
+            }
+            response(data);
+          },
+          error: function () {
+            clearPatientDetails();
+            $("#noPatientMsg").removeClass('hidden').text("Error fetching patient data.");
+          }
+        });
+      },
+      minLength: 1,
+      select: function (event, ui) {
+        $("#patient_id").val(ui.item.id);
+        $("#noPatientMsg").addClass('hidden');
+
+        // Fetch full patient details
+        $.get('/pages/fetch-patient.php?id=' + ui.item.id, function (data) {
+          try {
+            const p = JSON.parse(data);
+            $('#name_display').val(p.name);
+            $('#name').val(p.name);
+            $('#contact').val(p.contact);
+            $('#gender').val(p.gender);
+            $('#age').val(p.age);
+            $('#dob').val(p.dob);
+            $('#email').val(p.email);
+          } catch (e) {
+            clearPatientDetails();
+            $("#noPatientMsg").removeClass('hidden').text("Error loading patient details.");
+          }
+        });
+      }
+    });
   });
-});
 </script>
+
 
 </body>
 
