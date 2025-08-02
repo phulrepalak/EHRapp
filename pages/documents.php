@@ -39,7 +39,7 @@ $result = $conn->query($sql);
                     <?php endif; ?>
                 </button>
                 <div class="p-4 space-y-1">
-                    <a href="pages/patient-profile.php?id=<?= $row['patient_id'] ?>" class="text-blue-600 hover:underline">
+                    <a href="/admin-panel.php?page=patient-profile&id=<?= $row['patient_id'] ?>" class="text-blue-600 hover:underline">
                         👤 <?= htmlspecialchars($row['name']) ?>
                     </a>
                     <p class="text-sm text-gray-600">Report: <strong><?= htmlspecialchars($row['report_name']) ?></strong></p>

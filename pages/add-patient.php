@@ -1,5 +1,5 @@
 <?php
-include 'db.php'; // include your db connection file
+include 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get form inputs and sanitize
