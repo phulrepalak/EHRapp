@@ -178,7 +178,8 @@ if ($patient_id && is_numeric($patient_id)) {
 
 
         <div class="col-span-2 flex justify-end mt-4 gap-3">
-           <a href="admin-panel.php?page=upload_document.php&id=<?= $row['id'] ?>"
+          <a href="pages\upload-document.php?id=<?= urlencode($row['id']) ?>"
+
 
                 class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">Upload Document</a>
             <button type="button" id="editBtn"

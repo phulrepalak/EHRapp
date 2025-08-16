@@ -36,6 +36,11 @@ include 'includes/header.php';
                     include 'pages/add-patient.php';
                 } elseif ($page == 'patient-profile') {
                     include 'pages/patient-profile.php';
+                } elseif ($page == 'patient-profile') {
+                    include 'pages/update-document.php';
+                } elseif ($page == 'appointment-details') {
+                    $id = $_GET['page'] ?? null;
+                    include 'pages/appointment-edit.php';
                 } else {
                     echo '<p class="text-red-500">Page not found.</p>';
                 }

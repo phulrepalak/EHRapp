@@ -74,7 +74,7 @@ $result = $conn->query($sql);
                         <tr class="hover:bg-blue-50 transition">
                             <td class="px-6 py-4 text-sm text-gray-800"><?php echo $row['patient_id']; ?></td>
                             <td class="px-6 py-4 text-sm text-gray-800">
-                                <a href="pages\appointment-edit.php?id=<?php echo $row['patient_id']; ?>">
+                                <a href="?page=appointment-details&id=<?php echo $row['patient_id']; ?>">
                                     
                                     <?php echo htmlspecialchars($row['patient_name']); ?>
                                 </a>
